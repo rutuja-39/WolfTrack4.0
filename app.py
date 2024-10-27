@@ -58,22 +58,19 @@ create_tables(database)
 #     usertype = db.Column(db.String(20), nullable=False)
 
 class RegisterForm(FlaskForm):
-    username = StringField(render_kw={"placeholder": "Username"})
-    name = StringField(render_kw={"placeholder": "Name"})
-    password = PasswordField(render_kw={"placeholder": "Password"})
+    username = StringField(validators=[
+                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    name = StringField(validators=[
+                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Name"})
+    password = PasswordField(validators=[
+                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
     usertype = SelectField(render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
     submit = SubmitField('Register')
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    usertype = SelectField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
-
+    username = StringField(render_kw={"placeholder": "Username"})
+    password = PasswordField(render_kw={"placeholder": "Password"})
+    usertype = SelectField( render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
     submit = SubmitField('Login')
 
 @app.route('/')
@@ -360,4 +357,4 @@ def search():
         return f"Error: {e}"
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
