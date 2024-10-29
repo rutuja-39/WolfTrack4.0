@@ -77,10 +77,39 @@ class LoginForm(FlaskForm):
 def index():
     return render_template('index.html')
 
+@app.before_request
+def require_login():
+    # Define routes that do not require login
+    open_routes = ['/login', '/signup']
+    # Bypass static files to prevent them from being blocked
+    if request.path.startswith('/static/'):
+        return  # Allow static files
+    # Get the current path
+    path = request.path
+
+    # Debug statement to check current path
+    print(f"Request path: {path}")
+
+    # Allow open routes and API static files
+    if any(path.startswith(route) for route in open_routes):
+        print(f"Path '{path}' is open, no login required.")
+        return  # Allow open routes
+
+    # Redirect to login page if 'user_id' is not in the session
+    if 'user_id' not in session:
+        print(f"User not logged in, redirecting to login.")
+        flash('You need to be logged in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+
+def isLoggedIn():
+    return session['user_id']!=None and session['type']!=None
+
 @app.route('/logout',methods=['GET', 'POST'])
 def logout():
     session['type'] = ''
     session['user_id'] = None
+    session.clear()
     return redirect(url_for('login'))
 
 
@@ -127,6 +156,9 @@ def admin():
 
 @app.route('/student',methods=['GET', 'POST'])
 def student():
+    if(isLoggedIn()==False):
+        return redirect(url_for('login'))
+    print("st homepage")
     data_received = request.args.get('data')
     user = find_user(str(data_received),database)
 
@@ -137,6 +169,7 @@ def student():
 @app.route('/student/<status>', methods=['GET', 'POST'])
 def get_job_application_status(status):
     data_received = request.args.get('data')
+    print("faul ", data_received)
     user = find_user(str(data_received), database)
 
     if status:
@@ -350,6 +383,7 @@ def job_search():
 @app.route('/student/job_search/result', methods=['POST'])
 def search():
     job_role = request.form['job_role']
+    print(job_role)
     adzuna_url = f"https://api.adzuna.com/v1/api/jobs/us/search/1?app_id=575e7a4b&app_key=35423835cbd9428eb799622c6081ffed&what_phrase={job_role}"
     try:
         response = requests.get(adzuna_url)
