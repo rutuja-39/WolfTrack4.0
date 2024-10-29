@@ -32,10 +32,23 @@
                 </div>
             </div>
         </div>
+        
         <div class="forms">
             <div class="form-content">
                 <div class="signup-form">
                     <div class="title">Signup</div>
+                    <!-- Flash messages area with custom red text -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mt-3 alert-custom-red" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+
                     <form method="POST" action="" id="signup-form">
                         {{ form.hidden_tag() }}
                         <div class="input-box">

@@ -47,6 +47,17 @@ def add_client(value_set,db):
     conn.commit()
     conn.close()
 
+def get_user_by_username_role(username, usertype, db):
+    conn = sqlite3.connect(db)
+    print('Data==>', username, usertype)
+    cursor = conn.cursor()
+    # Querying the 'client' table
+    cursor.execute("SELECT * FROM client WHERE username = ? AND usertype=?", (username,usertype))
+    rows = cursor.fetchone()
+    conn.close()
+    print('rowsss->>>', rows)
+    return rows
+
 
 def find_user(data,db):
     conn = sqlite3.connect(db)

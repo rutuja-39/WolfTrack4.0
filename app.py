@@ -26,7 +26,7 @@ from flask import send_file, current_app as app
 from Controller.chat_gpt_pipeline import pdf_to_text,chatgpt
 from Controller.data import data, upcoming_events, profile
 from Controller.send_email import *
-from dbutils import add_job, create_tables, add_client, delete_job_application_by_company ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id
+from dbutils import add_job, create_tables, add_client, delete_job_application_by_company ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
 from login_utils import login_user
 import requests
 
@@ -88,7 +88,7 @@ def logout():
 def login():
     form = LoginForm() 
     if form.validate_on_submit():
-        user = find_user(str(form.username.data),database)
+        user = get_user_by_username_role(str(form.username.data), str(form.usertype.data), database)
         if user:
             if bcrypt.check_password_hash(user[3], form.password.data):
                 login_user(app,user)
@@ -98,12 +98,18 @@ def login():
                     return redirect(url_for('student', data=user[2]))
                 else:
                     pass
+        else:
+            flash('Invalid username, password or user type.', 'danger')
     return render_template('login.html',form = form)
 
 @app.route('/signup',methods=['GET', 'POST'])
 def signup():
     form = RegisterForm()
     if form.validate_on_submit():
+        user = find_user(str(form.username.data),database)
+        if user:
+            flash('Username already exists. Please choose a different username.', 'danger')
+            return render_template('signup.html',form = RegisterForm())
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         new_client = [form.name.data,form.username.data, hashed_password, form.usertype.data]
         add_client(new_client,database)
