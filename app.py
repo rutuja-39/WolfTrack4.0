@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2023 Shonil B, Akshada M, Rutuja R, Sakshi B
+Copyright (c) 2024 MD NAZMUL HAQUE, KISHAN KUMAR GANGULY, RAVI 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -26,7 +26,7 @@ from flask import send_file, current_app as app
 from Controller.chat_gpt_pipeline import pdf_to_text,chatgpt
 from Controller.data import data, upcoming_events, profile
 from Controller.send_email import *
-from dbutils import add_job, create_tables, add_client, delete_job_application_by_company ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
+from dbutils import add_job, create_tables, add_client, delete_job_application_by_job_id ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
 from login_utils import login_user
 import requests
 import urllib.parse
@@ -160,11 +160,10 @@ def admin():
 def student():
     if(isLoggedIn()==False):
         return redirect(url_for('login'))
-    user_id = session['user_name']
-    user = find_user(user_id,database)
+    user_name = session['user_name']
+    user = find_user(user_name,database)
 
-    jobapplications = get_job_applications(database)
-    print(len(jobapplications)," len")
+    jobapplications = get_job_applications(user_name, database)
     return render_template('home.html', user=user, jobapplications=jobapplications)
     # return render_template('home-2.html', user=user, jobapplications=jobapplications)
 
@@ -216,30 +215,29 @@ def add_job_application():
 @app.route('/student/update_job_application',methods=['GET','POST'])
 def update_job_application():
     if request.method == 'POST':
+        job_id = request.form['job_id']
         company = request.form['company']
         location = request.form['location']
         jobposition = request.form['jobposition']
         salary = request.form['salary']
         status = request.form['status']
-        user_id = request.form['user_id']
+        user_name = session['user_name']
 
         # Perform the update operation
-        update_job_application_by_id( company, location, jobposition, salary, status, database)  # Replace this with your method to update the job
+        update_job_application_by_id( job_id, company, location, jobposition, salary, status, database)  # Replace this with your method to update the job
 
         flash('Job Application Updated!')
         # Redirect to a success page or any relevant route after successful job update
-        return redirect(url_for('student', data=user_id))
+        return redirect(url_for('student', data=user_name))
 
-@app.route('/student/delete_job_application/<company>', methods=['POST'])
-def delete_job_application(company):
+@app.route('/student/delete_job_application', methods=['POST'])
+def delete_job_application():
     if request.method == 'POST':
-        user_id = request.form['user_id']
-        # Perform the deletion operation
-        delete_job_application_by_company(company,database)  # Using the function to delete by company name
-
+        job_id = request.args.get('job_id')
+        user_name = request.args.get('user_name')
+        delete_job_application_by_job_id(job_id,database)  
         flash('Job Application Deleted!')
-        # Redirect to a success page or any relevant route after successful deletion
-        return redirect(url_for('student', data=user_id))  # Redirect to the student page or your desired route
+        return redirect(url_for('student', data=user_name)) 
 
 @app.route('/student/add_New',methods=['GET','POST'])
 def add_New():
