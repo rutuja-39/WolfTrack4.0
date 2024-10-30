@@ -58,6 +58,7 @@
                     <th>Company</th>
                     <th>Location</th>
                     <th>Contract</th>
+                    <th>Description</th>
                     <th>Details</th>
                 </tr>
             </thead>
@@ -68,8 +69,37 @@
                     <td>{{ job.company.display_name }}</td>
                     <td>{{ job.location.display_name }}</td>
                     <td>{{ job.contract_time}}, {{job.contract_type}}</td>
-                    <td><a href="{{ job.redirect_url }}" class="btn btn-info" target="_blank">View</a></td>
+                    <td><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#jobModal{{ loop.index }}">Detail</button></td>
+                    <td><a href="{{ job.redirect_url }}" class="btn btn-info" target="_blank">Link</a></td>
                 </tr>
+                <!-- Bootstrap Modal -->
+                <div class="modal fade" id="jobModal{{ loop.index }}" tabindex="-1" aria-labelledby="jobModalLabel{{ loop.index }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="jobModalLabel{{ loop.index }}">Company:{{ job.company.display_name }}</h5>
+                                <br>
+                                <h6 class="modal-title" id="jobModalLabel{{ loop.index }}">Category:{{ job.category.label }}</h6>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Position: {{ job.title }}</h6>
+                                <h6>Location: {{ job.location.display_name }}</h6>
+                                {% if job.contract_time %} <h6>Contract Time: {{ job.contract_time }}</h6> {% endif %}
+                                {% if job.contract_type %} <h6>Contract Type: {{ job.contract_type }}</h6> {% endif %}
+                                {% if job.salary_min %} <h6>Min. Salary: {{ job.salary_min }}</h6> {% endif %}
+                                {% if job.salary_max %} <h6>Max. Salary: {{ job.salary_max }}</h6> {% endif %}
+                                <hr>
+                                <legend>Description:</legend>
+                                <p>{{ job.description }}</p> <!-- Job description displayed here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="{{ job.redirect_url }}" class="btn btn-primary" target="_blank">Apply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </tbody>
         </table>
