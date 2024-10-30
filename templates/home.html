@@ -9,15 +9,14 @@
             <h4>User Profile</h4>
             <form>
                 <div class="mb-3">
-                  <label for="username" class="form-label">Username: {{user[1]}}</label>
+                    <label for="username" class="form-label">Username: {{ user[1] }}</label>
                 </div>
                 <div class="mb-3">
-                  <label for="name" class="form-label">Name: {{user[2]}}</label>
-              </div>
-                <div class="mb-3">
-                    <label for="Role" class="form-label">Role: {{user[4]}}</label>
+                    <label for="name" class="form-label">Name: {{ user[2] }}</label>
                 </div>
-                
+                <div class="mb-3">
+                    <label for="Role" class="form-label">Role: {{ user[4] }}</label>
+                </div>
             </form>
         </div>
         {% endif %}
@@ -41,16 +40,22 @@
                 <tbody id="jobTable">
                     {% for row in jobapplications %}
                     <tr>
-                        <td>{{loop.index}}</td>
+                        <td>{{ loop.index }}</td>
                         <td>{{ row[1] }}</td>
                         <td>{{ row[2] }}</td>
                         <td>{{ row[3] }}</td>
                         <td>{{ row[4] }}</td>
                         <td>{{ row[5] }}</td>
                     </tr>
-                    {%endfor%}
+                    {% endfor %}
                 </tbody>
             </table>
+            <!-- Pagination Controls -->
+            <nav aria-label="Job table pagination">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination items will be dynamically added here -->
+                </ul>
+            </nav>
         </div>
 
         <!-- Right Column: CV Upload -->
@@ -66,25 +71,98 @@
         </div>
     </div>
 </div>
-<script>
-  document.getElementById('searchInput').addEventListener('keyup', function() {
-      let filter = this.value.toUpperCase();
-      let rows = document.querySelectorAll('#jobTable tr');
 
-      rows.forEach(row => {
-          // Skip the header row
-          if (row.querySelectorAll('th').length > 0) {
-              return;
-          }
-          let rowText = '';
-          // Concatenate text from all cells
-          for (let cell of row.cells) {
-              rowText += cell.textContent || cell.innerText;
-          }
-          // Check if the row includes the filter text
-          row.style.display = rowText.toUpperCase().includes(filter) ? '' : 'none';
-      });
-  });
-  </script>
-  
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rowsPerPage = 5; // Number of rows to display per page
+    let rows = document.querySelectorAll('#jobTable tr');
+    let pagination = document.getElementById('pagination');
+    let currentPage = 1;
+
+    function displayTableRows() {
+        let visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        visibleRows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end) ? '' : 'none';
+        });
+    }
+
+    function updatePagination() {
+        let visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        let totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+        pagination.innerHTML = '';
+
+        // Display pages only if there are more than one
+        if (totalPages <= 1) {
+            return;
+        }
+
+        // Previous button
+        if (currentPage > 1) {
+            let prevLi = document.createElement('li');
+            prevLi.className = 'page-item';
+            prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">&laquo;</a>`;
+            prevLi.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default anchor click behavior
+                currentPage--;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(prevLi);
+        }
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            let li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default anchor click behavior
+                currentPage = i;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(li);
+        }
+
+        // Next button
+        if (currentPage < totalPages) {
+            let nextLi = document.createElement('li');
+            nextLi.className = 'page-item';
+            nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">&raquo;</a>`;
+            nextLi.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default anchor click behavior
+                currentPage++;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(nextLi);
+        }
+    }
+
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+
+        rows.forEach(row => {
+            let rowText = '';
+            for (let cell of row.cells) {
+                rowText += cell.textContent || cell.innerText;
+            }
+            row.style.display = rowText.toUpperCase().includes(filter) ? '' : 'none';
+        });
+
+        // Reset to the first page and update pagination after search
+        currentPage = 1;
+        updatePagination();
+        displayTableRows();
+    });
+
+    // Initialize pagination and table display
+    updatePagination();
+    displayTableRows();
+});
+</script>
+
 {% endblock %}
