@@ -29,6 +29,8 @@ from Controller.send_email import *
 from dbutils import add_job, create_tables, add_client, delete_job_application_by_company ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
 from login_utils import login_user
 import requests
+import urllib.parse
+
 
 app = Flask(__name__)
 # api = Api(app)
@@ -80,7 +82,7 @@ def index():
 @app.before_request
 def require_login():
     # Define routes that do not require login
-    open_routes = ['/login', '/signup']
+    open_routes = ['/login', '/signup', '/static']
     # Bypass static files to prevent them from being blocked
     if request.path.startswith('/static/'):
         return  # Allow static files
@@ -340,8 +342,6 @@ def display():
         user = find_user(str(user),database)
         return render_template('home.html', user=user, data=data, upcoming_events=upcoming_events)
 
-
-
 @app.route('/student/chat_gpt_analyzer/', methods=['GET'])
 def chat_gpt_analyzer():
     files = os.listdir(os.getcwd()+'/Controller/resume')
@@ -382,15 +382,26 @@ def job_search():
 
 @app.route('/student/job_search/result', methods=['POST'])
 def search():
-    job_role = request.form['job_role']
-    print(job_role)
-    adzuna_url = f"https://api.adzuna.com/v1/api/jobs/us/search/1?app_id=575e7a4b&app_key=35423835cbd9428eb799622c6081ffed&what_phrase={job_role}"
+    job_title = urllib.parse.quote(request.form['job_title'])
+    location = urllib.parse.quote(request.form['location'])
+    minSalary = request.form['minSalary']
+    maxSalary = request.form['maxSalary']
+    job_type = request.form['job_type']
+    company = urllib.parse.quote(request.form['company'])
+    query = "what_phrase="+job_title
+    if(len(minSalary)>0): query+="&salary_min="+minSalary
+    if(len(maxSalary)>0): query+="&salary_max="+maxSalary
+    if(job_type=="full_time"): query+="&full_time=1"
+    if(job_type=="part_time"): query+="&part_time=1"
+    if(len(company)>0): query+="&company="+company
+
+    adzuna_url = f"https://api.adzuna.com/v1/api/jobs/gb/search/1?app_id=575e7a4b&app_key=35423835cbd9428eb799622c6081ffed&"+query
     try:
         response = requests.get(adzuna_url)
         if response.status_code == 200:
             data = response.json()
             jobs = data.get('results', [])
-            return render_template('job_search_results.html', jobs=jobs)
+            return render_template('job_search.html', jobs=jobs)
         else:
             return "Error fetching job listings"
     except requests.RequestException as e:

@@ -55,7 +55,6 @@ def get_user_by_username_role(username, usertype, db):
     cursor.execute("SELECT * FROM client WHERE username = ? AND usertype=?", (username,usertype))
     rows = cursor.fetchone()
     conn.close()
-    print('rowsss->>>', rows)
     return rows
 
 

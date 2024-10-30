@@ -1,86 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout/init.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Job Search</title>
+{% block title %}Job Search{% endblock %}
 
-    <style>
-        body {
-            background-color: red;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
+{% block content %}
+<div class="container mt-5">
+    <!-- Top Div: Search Filters -->
+    <div class="card p-4 mb-4">
+        <h2>Search Jobs</h2>
+        <form action="/student/job_search/result" method="post">
+            <div class="row mb-3">
+                <!-- Job Title Field -->
+                <div class="col-md-4">
+                    <label for="job_title" class="form-label">Job Title*</label>
+                    <input type="text" class="form-control" id="job_title" name="job_title" required placeholder="e.g. Software Engineer">
+                </div>
+                <!-- Location Field -->
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" placeholder="e.g. New York">
+                </div>
+                <!-- Salary Field -->
+                <div class="col-md-4">
+                    <label for="minSalary" class="form-label">Min. Salary</label>
+                    <input type="number" class="form-control" id="minSalary" name="minSalary" placeholder="e.g. 5000">
+                </div>
+                <!-- Salary Field -->
+                <div class="col-md-4">
+                    <label for="maxSalary" class="form-label">Max. Salary</label>
+                    <input type="number" class="form-control" id="maxSalary" name="maxSalary" placeholder="e.g. 10000">
+                </div>
+                <!-- Job Type Field -->
+                <div class="col-md-4">
+                    <label for="job_type" class="form-label">Job Type</label>
+                    <select class="form-select" id="job_type" name="job_type">
+                        <option value="full_time">Full-time</option>
+                        <option value="part_time">Part-time</option>
+                    </select>
+                </div>
+                <!-- Company Field -->
+                <div class="col-md-4">
+                    <label for="company" class="form-label">Company</label>
+                    <input type="text" class="form-control" id="company" name="company" placeholder="e.g. Apple">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search Jobs</button>
+        </form>
+    </div>
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        form {
-            background-color: white;
-            color: red;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: red;
-            font-weight: bold;
-        }
-
-        input {
-            padding: 10px;
-            width: calc(100% - 20px);
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            border: 1px solid red;
-            border-radius: 5px;
-            transition: border-color 0.3s ease;
-            color: red;
-        }
-
-        input[type="text"]:focus {
-            border-color: #ff9999;
-        }
-
-        input[type="submit"] {
-            background-color: red;
-            color: white;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #ff9999;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Job Search</h1>
-    <form action="/student/job_search/result" method="post">
-        <label for="job_role">Enter Job Role:</label><br>
-        <input type="text" id="job_role" name="job_role" required><br>
-        <input type="submit" value="Search">
-    </form>
-</body>
-
-</html>
+    <!-- Bottom Div: Search Results -->
+    <div class="card p-4">
+        <h2>Job Search Results</h2>
+        {% if jobs %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Location</th>
+                    <th>Contract</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td>{{ job.company.display_name }}</td>
+                    <td>{{ job.location.display_name }}</td>
+                    <td>{{ job.contract_time}}, {{job.contract_type}}</td>
+                    <td><a href="{{ job.redirect_url }}" class="btn btn-info" target="_blank">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">No jobs found. Please try a different search.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
