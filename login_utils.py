@@ -60,6 +60,7 @@ def login_user(app,user, remember=False, duration=None, force=False, fresh=True)
     """
     print("###USER",user)
     session["user_id"] = user[0]
+    session["user_name"] = user[1]
     session["type"] = user[4]
     session["_fresh"] = fresh
     session["_id"] = get_session_identifier()

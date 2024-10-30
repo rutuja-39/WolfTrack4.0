@@ -160,13 +160,13 @@ def admin():
 def student():
     if(isLoggedIn()==False):
         return redirect(url_for('login'))
-    print("st homepage")
-    data_received = request.args.get('data')
-    user = find_user(str(data_received),database)
-
+    user_id = session['user_name']
+    user = find_user(user_id,database)
 
     jobapplications = get_job_applications(database)
+    print(len(jobapplications)," len")
     return render_template('home.html', user=user, jobapplications=jobapplications)
+    # return render_template('home-2.html', user=user, jobapplications=jobapplications)
 
 @app.route('/student/<status>', methods=['GET', 'POST'])
 def get_job_application_status(status):
