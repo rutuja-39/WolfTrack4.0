@@ -10,6 +10,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '''
 import sqlite3
+import os
+
 
 def create_tables(db):
     conn = sqlite3.connect(db)
@@ -32,6 +34,16 @@ def create_tables(db):
         salary INTEGER,
         status TEXT
     )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS resumes (
+            id	INTEGER NOT NULL,
+            username	TEXT NOT NULL,
+            fileName	TEXT NOT NULL,
+            PRIMARY KEY(id AUTOINCREMENT),
+            UNIQUE(username, fileName),
+            FOREIGN KEY(username) REFERENCES client(username)
+        )
     ''')
     conn.commit()
     conn.close()
@@ -118,6 +130,23 @@ def get_job_applications_by_status(db, status):
     conn.close()
     print('rows ->>>', rows)
     return rows
+
+def get_resumes_by_user_name(user_name, db):
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    print("Tables:", tables)
+    db_path = os.path.abspath(db)
+    print(f"Connecting to database: {db_path}")
+
+    cursor.execute("SELECT * FROM resumes WHERE username = ?", (user_name,))
+    rows = cursor.fetchall()  # Use fetchall() to get all rows
+    conn.close()
+    print('rows ->>>', rows)
+    return rows
+
 
 
 

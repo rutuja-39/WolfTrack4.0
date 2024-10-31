@@ -26,7 +26,7 @@ from flask import send_file, current_app as app
 from Controller.gemini_pipeline import get_gemini_feedback
 from Controller.data import data, upcoming_events, profile
 from Controller.send_email import *
-from dbutils import add_job, create_tables, add_client, delete_job_application_by_job_id ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
+from dbutils import add_job, create_tables, add_client, get_resumes_by_user_name, delete_job_application_by_job_id ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
 from login_utils import login_user
 import requests
 import urllib.parse
@@ -307,7 +307,8 @@ def upload():
 
 @app.route('/student/analyze_resume', methods=['GET'])
 def view_ResumeAna():
-    return render_template('resume_analyzer.html')
+    resumes = get_resumes_by_user_name(session['user_name'], database)
+    return render_template('resume_analyzer.html', resumes=resumes)
 
 @app.route('/student/companiesList', methods=['GET'])
 def view_companies_list():
@@ -316,7 +317,7 @@ def view_companies_list():
 
 @app.route('/student/analyze_resume', methods=['POST'])
 def analyze_resume():
-    jobtext = request.form['jobtext']
+    jobtext = request.form['job_description']
     os.chdir(os.getcwd()+"/Controller/resume/")
     output = resume_analyzer(jobtext, str(os.listdir(os.getcwd())[0]))
     os.chdir("..")
