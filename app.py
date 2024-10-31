@@ -10,7 +10,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '''
 import os
-from flask import Flask, request, render_template, make_response, redirect,url_for,send_from_directory, session, flash
+from flask import Flask, request, render_template, make_response, redirect,url_for,send_from_directory, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
@@ -23,7 +23,7 @@ from Controller.ResumeParser import *
 from Utils.jobprofileutils import *
 import os
 from flask import send_file, current_app as app
-from Controller.chat_gpt_pipeline import pdf_to_text,chatgpt
+from Controller.gemini_pipeline import get_gemini_feedback
 from Controller.data import data, upcoming_events, profile
 from Controller.send_email import *
 from dbutils import add_job, create_tables, add_client, delete_job_application_by_job_id ,find_user, get_job_applications, get_job_applications_by_status, update_job_application_by_id, get_user_by_username_role
@@ -303,8 +303,6 @@ def upload():
     user = request.form['user_id']
     
     user = find_user(str(user),database)
-    print('Userrrrrr', user)
-
 
     return render_template("home.html", data=data, upcoming_events=upcoming_events, user=user)
 
@@ -336,40 +334,58 @@ def display():
         user = request.form['user_id']
         user = find_user(str(user),database)
         return render_template('home.html', user=user, data=data, upcoming_events=upcoming_events)
+def section_strip(section, section_name):
+    if section_name in section:
+        section = section.replace(section_name+"**", "", 1).strip()
 
-@app.route('/student/chat_gpt_analyzer/', methods=['GET'])
-def chat_gpt_analyzer():
-    files = os.listdir(os.getcwd()+'/Controller/resume')
-    pdf_path = os.getcwd()+'//Controller/resume/'+files[0]
-    text_path = os.getcwd()+'//Controller/resume_txt/'+files[0][:-3]+'txt'
-    with open(text_path, 'w'):
-        pass
-    pdf_to_text(pdf_path, text_path)
-    suggestions = chatgpt(text_path)
-    flag = 0
-    final_sugges_send = []
-    final_sugges = ""
+    # Remove asterisks from the end
+    section = section.rstrip('*').strip()
+    return section
 
-    # Initialize an empty string to store the result
-    result_string = ""
+@app.route('/student/resume_AI_analyzer/', methods=['GET'])
+def resume_AI_analyzer():
+    resume_dir = os.path.join(os.getcwd(), 'Controller', 'resume')
 
-    # Iterate through each character in the original string
-    for char in suggestions:
-        # If the character is not a newline character, add it to the result string
-        if char != '\n':
-            final_sugges += char
-    sections = final_sugges.split("Section")
-    for section in sections:
-        section = section.strip()  # Remove leading and trailing whitespace
-        # if section:  # Check if the section is not empty (e.g., due to leading/trailing "Section")
-        #     print("Section:", section)
-    sections = sections[1:]
-    section_names = ['Education', 'Experience','Skills', 'Projects']
-    sections[0] = sections[0][3:]
-    sections[1] = sections[1][3:]
-    sections[2] = sections[2][3:]
-    sections[3] = sections[3][3:]
-    return render_template('chat_gpt_analyzer.html', suggestions=sections, pdf_path=pdf_path, section_names = section_names)
+    files = os.listdir(resume_dir)
+    if not files:
+        return jsonify({"error": "No resume files found."}), 404
+
+    pdf_file = files[0]
+    pdf_path = os.path.join(resume_dir, pdf_file)
+    
+    if not os.path.exists(pdf_path):
+        return jsonify({"error": f"PDF file '{pdf_file}' does not exist."}), 404
+
+    suggestions = get_gemini_feedback(pdf_path)
+
+    if suggestions:
+        final_sugges = ""
+
+        # Iterate through each character in the original string
+        for char in suggestions:
+            # If the character is not a newline character, add it to the result string
+            if char != '\n':
+                final_sugges += char
+        
+        sections = final_sugges.split("Section")
+        section_names = ['Education', 'Experiences','Skills', 'Projects']
+
+        for index, section in enumerate(sections):
+            section = section.strip()  # Remove leading and trailing whitespace
+            if index: 
+                print("before:",section)
+                section = section_strip(section, section_names[index-1])
+            sections[index] = section
+            # if section:  # Check if the section is not empty (e.g., due to leading/trailing "Section")
+            #     print("Section:", section)
+        sections = sections[1:]
+        sections[0] = sections[0][3:]
+        sections[1] = sections[1][3:]
+        sections[2] = sections[2][3:]
+        sections[3] = sections[3][3:]
+        return render_template('gemini_analyzer.html', suggestions=sections, pdf_path=pdf_path, section_names = section_names)
+    else:
+        return jsonify({"error": f"No suggestion was generated"}), 404
 
 @app.route('/student/job_search')
 def job_search():
