@@ -5,26 +5,26 @@
 {% block content %}
 <div class="container mt-5">
     <!-- Top Div: Search Filters -->
-    <div class="card p-4 mb-4">
-        <h2>Search Jobs</h2>
-        <form action="/student/job_search/result" method="post">
+    <div class="card p-4 mb-4 shadow">
+        <h2 class="mb-4">Search Jobs</h2>
+        <form action="/student/job_search/result" method="post" novalidate>
             <div class="row mb-3">
                 <!-- Job Title Field -->
                 <div class="col-md-4">
                     <label for="job_title" class="form-label">Job Title*</label>
                     <input type="text" class="form-control" id="job_title" name="job_title" required placeholder="e.g. Software Engineer">
+                    <div class="invalid-feedback">Please provide a job title.</div>
                 </div>
                 <!-- Location Field -->
                 <div class="col-md-4">
                     <label for="location" class="form-label">Location</label>
                     <input type="text" class="form-control" id="location" name="location" placeholder="e.g. New York">
                 </div>
-                <!-- Salary Field -->
+                <!-- Salary Fields -->
                 <div class="col-md-4">
                     <label for="minSalary" class="form-label">Min. Salary</label>
                     <input type="number" class="form-control" id="minSalary" name="minSalary" placeholder="e.g. 5000">
                 </div>
-                <!-- Salary Field -->
                 <div class="col-md-4">
                     <label for="maxSalary" class="form-label">Max. Salary</label>
                     <input type="number" class="form-control" id="maxSalary" name="maxSalary" placeholder="e.g. 10000">
@@ -33,6 +33,7 @@
                 <div class="col-md-4">
                     <label for="job_type" class="form-label">Job Type</label>
                     <select class="form-select" id="job_type" name="job_type">
+                        <option value="">Select Job Type</option>
                         <option value="full_time">Full-time</option>
                         <option value="part_time">Part-time</option>
                     </select>
@@ -48,8 +49,8 @@
     </div>
 
     <!-- Bottom Div: Search Results -->
-    <div class="card p-4">
-        <h2>Job Search Results</h2>
+    <div class="card p-4 shadow">
+        <h2 class="mb-4">Job Search Results</h2>
         {% if jobs %}
         <input class="form-control mb-3" id="searchInput" type="text" placeholder="Search for jobs...">
         <table class="table table-striped mt-3">
@@ -69,7 +70,7 @@
                     <td>{{ job.title }}</td>
                     <td>{{ job.company.display_name }}</td>
                     <td>{{ job.location.display_name }}</td>
-                    <td>{{ job.contract_time}}, {{job.contract_type}}</td>
+                    <td>{{ job.contract_time }}, {{ job.contract_type }}</td>
                     <td><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#jobModal{{ loop.index }}">Detail</button></td>
                     <td><a href="{{ job.redirect_url }}" class="btn btn-info" target="_blank">Link</a></td>
                 </tr>
@@ -78,9 +79,8 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="jobModalLabel{{ loop.index }}">Company:{{ job.company.display_name }}</h5>
-                                <br>
-                                <h6 class="modal-title" id="jobModalLabel{{ loop.index }}">Category:{{ job.category.label }}</h6>
+                                <h5 class="modal-title" id="jobModalLabel{{ loop.index }}">Company: {{ job.company.display_name }}</h5>
+                                <h6 class="modal-title">Category: {{ job.category.label }}</h6>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -92,7 +92,7 @@
                                 {% if job.salary_max %} <h6>Max. Salary: {{ job.salary_max }}</h6> {% endif %}
                                 <hr>
                                 <legend>Description:</legend>
-                                <p>{{ job.description }}</p> <!-- Job description displayed here -->
+                                <p>{{ job.description }}</p>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -115,6 +115,7 @@
         {% endif %}
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const rowsPerPage = 5; // Number of rows to display per page
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             prevLi.className = 'page-item';
             prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">&laquo;</a>`;
             prevLi.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default anchor click behavior
+                e.preventDefault();
                 currentPage--;
                 displayTableRows();
                 updatePagination();
@@ -162,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             li.className = `page-item ${i === currentPage ? 'active' : ''}`;
             li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
             li.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default anchor click behavior
+                e.preventDefault();
                 currentPage = i;
                 displayTableRows();
                 updatePagination();
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nextLi.className = 'page-item';
             nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">&raquo;</a>`;
             nextLi.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default anchor click behavior
+                e.preventDefault();
                 currentPage++;
                 displayTableRows();
                 updatePagination();
@@ -189,22 +190,17 @@ document.addEventListener('DOMContentLoaded', function() {
         let filter = this.value.toUpperCase();
 
         rows.forEach(row => {
-            let rowText = '';
-            for (let cell of row.cells) {
-                rowText += cell.textContent || cell.innerText;
-            }
+            let rowText = row.innerText || row.textContent;
             row.style.display = rowText.toUpperCase().includes(filter) ? '' : 'none';
         });
 
-        // Reset to the first page and update pagination after search
-        currentPage = 1;
-        updatePagination();
+        currentPage = 1; // Reset to first page
         displayTableRows();
+        updatePagination();
     });
 
-    // Initialize pagination and table display
-    updatePagination();
     displayTableRows();
+    updatePagination();
 });
 </script>
 {% endblock %}
