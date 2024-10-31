@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>WolfTrack</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    <!-- Fontawesome CDN Link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
@@ -37,17 +36,16 @@
             <div class="form-content">
                 <div class="signup-form">
                     <div class="title">Signup</div>
-                    <!-- Flash messages area with custom red text -->
+                    <!-- Flash messages area -->
                     {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} mt-3 alert-custom-red" role="alert">
+                            <div class="alert alert-{{ category }} mt-3" role="alert">
                                 {{ message }}
                             </div>
                         {% endfor %}
                     {% endif %}
                     {% endwith %}
-
 
                     <form method="POST" action="" id="signup-form">
                         {{ form.hidden_tag() }}
@@ -97,7 +95,6 @@
         document.getElementById("username").addEventListener("input", function () {
             const username = document.getElementById("username").value;
             const usernameMessage = document.getElementById("usernameMessage");
-            console.log(username)
 
             if (username.length < 4) {
                 usernameMessage.textContent = "Username must be at least 4 characters long.";
