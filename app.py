@@ -279,6 +279,7 @@ def job_profile_analyze():
     if request.method == 'POST':
         job_profile = request.form['job_profile']
         skills = extract_skills(job_profile)
+        print("\n\n\n\n\n",skills)
         skills_text = ', '.join(skills)
         return render_template('job_profile_analyze.html', skills_text=skills_text, job_profile=job_profile)
     return render_template('job_profile_analyze.html', skills_text='', job_profile='')
