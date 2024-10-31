@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title> WolfTrack </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+    <style>
+        body {
+            overflow: hidden; /* This will hide the scroll bar */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+        .main-body {
+            overflow: hidden; /* This will hide the scroll bar */
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Set height to 100% of viewport height */
+        }
+
+        .project-container {
+            flex: 1; /* Use remaining height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .circle-img {
+            margin: 0; /* Remove margin to eliminate white space */
+        }
+
+        button {
+            font-family: "Poppins-Regular";
+            font-size: 15px;
+            color: rgb(255, 239, 239);
+        }
+
+        .button--tamaya>span {
+            display: block;
+            transform: scale3d(0.2, 0.2, 1);
+            opacity: 0;
+            transition-duration: 0.3s, 0.3s;
+            transition-delay: initial, initial;
+            transition-property: transform, opacity;
+            transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .button>span {
+            vertical-align: middle;
+        }
+
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-body">
+        <nav class="navbar navbar-expand-sm navbar-dark sticky-top" style="justify-content: center;">
+            <ul class="navbar-nav ">
+                <a class="navbar-brand" href="/">
+                    <h1>WolfTrack 5.0</h1>
+                </a>
+            </ul>
+        </nav>
+
+        <div class="project-container">
+            <div class="main-header">
+                <div class="main-container">
+                    <div class="image-container">
+                        <img class="rounded-circle circle-img" alt="100x100"
+                            src="https://ih1.redbubble.net/image.1703296696.9941/st,small,507x507-pad,600x600,f8f8f8.jpg"
+                            height="400px" width="400px" data-holder-rendered="true"></img>
+                    </div>
+
+                    <div class="button-container">
+                        <a href="{{url_for('login')}}" class="button4"><h6>Login</h6></a>
+                        <div class="divider"> </div>
+                        <a href="{{url_for('signup')}}" class="button4"><h6>Signup</h6></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

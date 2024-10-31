@@ -1,124 +1,143 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> WolfTrack </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-
-    <!-- Fontawesome CDN Link -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
-
-    <style>
-        body {
-            overflow: hidden; /* This will hide the scroll bar */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
-        }
-
-        .main-body {
-            overflow: hidden; /* This will hide the scroll bar */
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Set height to 100% of viewport height */
-        }
-
-        .project-container {
-            flex: 1; /* Use remaining height */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .main-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .circle-img {
-            margin: 0; /* Remove margin to eliminate white space */
-        }
-
-        button {
-            font-family: "Poppins-Regular";
-            font-size: 15px;
-            color: rgb(255, 239, 239);
-        }
-
-        .button--tamaya>span {
-            display: block;
-            transform: scale3d(0.2, 0.2, 1);
-            opacity: 0;
-            transition-duration: 0.3s, 0.3s;
-            transition-delay: initial, initial;
-            transition-property: transform, opacity;
-            transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
-        }
-
-        .button>span {
-            vertical-align: middle;
-        }
-
-        *,
-        ::after,
-        ::before {
-            box-sizing: border-box;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/init.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <title>{% block title %}WolfTrack{% endblock %}</title>
 </head>
-
 <body>
-
-    <div class="main-body">
-        <nav class="navbar navbar-expand-sm navbar-dark sticky-top" style="justify-content: center;">
-            <ul class="navbar-nav ">
-                <a class="navbar-brand" href="/">
-                    <h1>WolfTrack 5.0</h1>
-                </a>
-            </ul>
-        </nav>
-
-        <div class="project-container">
-            <div class="main-header">
-                <div class="main-container">
-                    <div class="image-container">
-                        <img class="rounded-circle circle-img" alt="100x100"
-                            src="https://ih1.redbubble.net/image.1703296696.9941/st,small,507x507-pad,600x600,f8f8f8.jpg"
-                            height="400px" width="400px" data-holder-rendered="true"></img>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                <img
+                  class="rounded-circle project-icon"
+                  alt="100x100"
+                  src="https://ih1.redbubble.net/image.1703296696.9941/st,small,507x507-pad,600x600,f8f8f8.jpg"
+                  height="30px"
+                  width="30px"
+                  style="margin-right: 5px; margin-top: 5px"
+                  data-holder-rendered="true"
+                />
+                <a class="navbar-brand" href="/student">WolfTrack</a>
+              </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginModal" href="#loginModal">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#signUpModal" href="#loginModal">Sign Up</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('login') }}" method="POST">
+                    <div class="modal-body">
+                        <!-- Username Field -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
                     </div>
-
-                    <div class="button-container">
-                        <a href="{{url_for('login')}}" class="button4"><h6>Login</h6></a>
-                        <div class="divider"> </div>
-                        <a href="{{url_for('signup')}}" class="button4"><h6>Signup</h6></a>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Main Body Content -->
+    <div class="container-fluid mt-5 pt-3">
+        <div class="row">
+            <!-- Welcome Section -->
+            <div class="col-12 text-center mb-5">
+                <h1>Welcome to WolfTrack</h1>
+                <p>Your gateway to job opportunities, resume evaluation, and career development at NC State University.</p>
+            </div>
+    
+            <!-- Features Section -->
+            <div class="row text-center">
+                <!-- Job Searching Feature -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-briefcase fa-3x mb-3 text-primary"></i>
+                            <h3>Job Searching</h3>
+                            <p>Explore thousands of job opportunities that fit your skills and preferences. WolfTrack helps you find the best jobs, internships, and co-ops to boost your career.</p>
+                            <a href="/student/job_search" class="btn btn-primary mt-3">Search Jobs</a>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Resume Evaluation Feature -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-file-alt fa-3x mb-3 text-success"></i>
+                            <h3>Resume Evaluation</h3>
+                            <p>Get your resume evaluated to improve your chances of landing your dream job. Our advanced AI tools provide feedback to make your resume stand out.</p>
+                            <a href="/student/analyze_resume" class="btn btn-success mt-3">Evaluate Resume</a>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Resume Suggestions Feature -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-lightbulb fa-3x mb-3 text-warning"></i>
+                            <h3>Resume Suggestions</h3>
+                            <p>Receive personalized suggestions to optimize your resume for specific job opportunities and industries, leveraging the latest AI-powered tools.</p>
+                            <a href="/chat_gpt_analyzer" class="btn btn-warning mt-3">Get Suggestions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Skill Check Feature Section -->
+            <div class="row text-center mt-5">
+                <div class="col-md-6 offset-md-3 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-chart-bar fa-3x mb-3 text-info"></i>
+                            <h3>Skill Check</h3>
+                            <p>Assess your skills and identify areas of improvement. With WolfTrack, you can discover and develop the skills that are in demand by top employers.</p>
+                            <a href="/student/job_profile_analyze" class="btn btn-info mt-3">Take Skill Assessment</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-</body>
+    <!-- Footer -->
+    <footer class="footer footer-custom mt-auto py-3 text-center">
+        <div class="container">
+            <span>&copy; 2024 WolfTrack. All rights reserved.</span>
+        </div>
+    </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
