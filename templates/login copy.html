@@ -15,7 +15,6 @@
     <div class="container">
         <input type="checkbox" id="flip">
         <div class="cover">
-            <!-- Image part from the old file -->
             <div class="front">
                 <img src="{{ url_for('static', filename='images/frontImg.jpg') }}" alt="">
                 <div class="text">
@@ -46,20 +45,26 @@
                     {% endif %}
                     {% endwith %}
                     
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }}
+                    <form method="POST" action="{{ url_for('login') }}">
                         <div class="input-box">
-                            {{ form.username.label }}
-                            {{ form.username }}
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required placeholder="Enter your username">
                         </div>
                         <div class="input-box">
-                            {{ form.password.label }}
-                            {{ form.password }}
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required placeholder="Enter your password">
                         </div>
-                        {{ form.usertype }}
-                        {{ form.submit }}
+                        <div class="input-box">
+                            <label for="user_role">User Role</label>
+                            <select id="user_role" name="user_role" required>
+                                <option value="" selected disabled>Select your role</option>
+                                <option value="admin">Admin</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        <p class="mt-3"><a href="{{ url_for('signup') }}">Do not have an account? SignUp</a></p>
                     </form>
-                    <a href="{{ url_for('signup') }}">Do not have an account? SignUp</a>
                 </div>
             </div>
         </div>
