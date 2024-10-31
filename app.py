@@ -59,16 +59,22 @@ create_tables(database)
 #     password = db.Column(db.String(80), nullable=False)
 #     usertype = db.Column(db.String(20), nullable=False)
 
+def isLoggedIn():
+    return 'user_name' in session and session.get('user_name') is not None
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    user_name=""
+    if(isLoggedIn()):
+        user_name = session['user_name']
+    return render_template('index.html', user_name=user_name)
 
 @app.before_request
 def require_login():
     # Define routes that do not require login
     open_routes = ['/login', '/signup', '/static']
     # Bypass static files to prevent them from being blocked
-    if request.path.startswith('/static/') or request.path=="/":
+    if request.path=="/" or request.path.startswith('/static/'):
         return  # Allow static files
     # Get the current path
     path = request.path
@@ -87,17 +93,10 @@ def require_login():
         flash('You need to be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
 
-
-def isLoggedIn():
-    return session['user_id']!=None and session['type']!=None
-
 @app.route('/logout',methods=['GET', 'POST'])
 def logout():
-    session['type'] = ''
-    session['user_id'] = None
     session.clear()
-    return redirect(url_for('/'))
-
+    return render_template('index.html')
 
 @app.route('/login',methods=['GET', 'POST'])
 def login():
@@ -162,7 +161,6 @@ def student():
 
     jobapplications = get_job_applications(user_name, database)
     return render_template('home.html', user=user, jobapplications=jobapplications)
-    # return render_template('home-2.html', user=user, jobapplications=jobapplications)
 
 @app.route('/student/<status>', methods=['GET', 'POST'])
 def get_job_application_status(status):
