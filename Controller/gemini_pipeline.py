@@ -21,14 +21,14 @@ def get_gemini_feedback(pdf_path):
         genai.configure(api_key=API_KEY)
         model = genai.GenerativeModel("gemini-1.5-flash")
         sample_pdf = genai.upload_file(pdf_path)
-        prompt = "critique the following resume on the basis of its conciseness, use of action words and numbers. Give suggestions on the 1. education section, then the 2. experiences section, then the 3. skills section and finally the 4. projects section. Give these suggestions on these four sections in the form of four paragraphs and label them Section 1, Section 2, Section 3 and Section 4 respectively, each separated by a line. Make sure each paragraph is atleast 50-70 words long." 
+        prompt = "critique the following resume on the basis of its conciseness, use of action words and numbers. Give suggestions on the 1. structure and design section, then the 2. education section, then the 3. experiences section, then the 4. skills section and finally the 5. projects section. Give these suggestions on these four sections in the form of four paragraphs and label them Section 1, Section 2, Section 3 and Section 4 respectively, each separated by a line. Make sure each paragraph is atleast 50-70 words long." 
         try:
             response = model.generate_content(
                 [prompt, sample_pdf],
                 generation_config=genai.types.GenerationConfig(
                     # Only one candidate for now.
                     candidate_count=1,
-                    max_output_tokens=10000,
+                    max_output_tokens=20000,
                     temperature=0.8,
                 ),
             )

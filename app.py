@@ -357,7 +357,7 @@ def resume_AI_analyzer():
         return jsonify({"error": f"PDF file '{pdf_file}' does not exist."}), 404
 
     suggestions = get_gemini_feedback(pdf_path)
-
+    print(suggestions)
     if suggestions:
         final_sugges = ""
 
@@ -368,7 +368,7 @@ def resume_AI_analyzer():
                 final_sugges += char
         
         sections = final_sugges.split("Section")
-        section_names = ['Education', 'Experiences','Skills', 'Projects']
+        section_names = ['Structure and Design', 'Education', 'Experiences','Skills', 'Projects']
 
         for index, section in enumerate(sections):
             section = section.strip()  # Remove leading and trailing whitespace
@@ -383,6 +383,7 @@ def resume_AI_analyzer():
         sections[1] = sections[1][3:]
         sections[2] = sections[2][3:]
         sections[3] = sections[3][3:]
+        sections[4] = sections[4][3:]
         return render_template('gemini_analyzer.html', suggestions=sections, pdf_path=pdf_path, section_names = section_names)
     else:
         return jsonify({"error": f"No suggestion was generated"}), 404
