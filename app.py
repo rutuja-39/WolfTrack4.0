@@ -69,12 +69,6 @@ class RegisterForm(FlaskForm):
     usertype = SelectField(render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
     submit = SubmitField('Register')
 
-class LoginForm(FlaskForm):
-    username = StringField(render_kw={"placeholder": "Username"})
-    password = PasswordField(render_kw={"placeholder": "Password"})
-    usertype = SelectField( render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
-    submit = SubmitField('Login')
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -117,21 +111,25 @@ def logout():
 
 @app.route('/login',methods=['GET', 'POST'])
 def login():
-    form = LoginForm() 
-    if form.validate_on_submit():
-        user = get_user_by_username_role(str(form.username.data), str(form.usertype.data), database)
-        if user:
-            if bcrypt.check_password_hash(user[3], form.password.data):
-                login_user(app,user)
-                if user[4] == 'admin':
-                    return redirect(url_for('admin', data=user[2]))
-                elif user[4] == 'student':
-                    return redirect(url_for('student', data=user[2]))
-                else:
-                    pass
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user_role = request.form['user_role']
+
+        user = get_user_by_username_role(username, user_role, database)
+        if user and bcrypt.check_password_hash(user[3], password):
+            # User authenticated successfully
+            login_user(app,user)
+
+            if user_role == 'admin':
+                return redirect(url_for('admin', data=username))  # Replace with actual route name
+            elif user_role == 'student':
+                return redirect(url_for('student', data=username))  # Replace with actual route name
         else:
-            flash('Invalid username, password or user type.', 'danger')
-    return render_template('login.html',form = form)
+            flash('Invalid username, password, or role. Please try again.', 'danger')
+            return redirect(url_for('login'))
+
+    return render_template('login.html')
 
 @app.route('/signup',methods=['GET', 'POST'])
 def signup():

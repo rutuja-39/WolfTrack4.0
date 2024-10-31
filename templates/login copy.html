@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WolfTrack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <input type="checkbox" id="flip">
+        <div class="cover">
+            <!-- Image part from the old file -->
+            <div class="front">
+                <img src="{{ url_for('static', filename='images/frontImg.jpg') }}" alt="">
+                <div class="text">
+                    <span class="text-1"><h2>WolfTrack</h2><br></span>
+                    <span class="text-2">Don't stop until you're proud!</span>
+                </div>
+            </div>
+            <div class="back">
+                <img class="backImg" src="{{ url_for('static', filename='images/backImg.jpg') }}" alt="">
+                <div class="text">
+                    <span class="text-1">Complete miles of journey <br> with one click</span>
+                    <span class="text-2">Let's get started</span>
+                </div>
+            </div>
+        </div>
+        <div class="forms">
+            <div class="form-content">
+                <div class="login-form">
+                    <div class="title">Login</div>
+                    <!-- Flash messages area with custom red text -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mt-3 alert-custom-red" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <div class="input-box">
+                            {{ form.username.label }}
+                            {{ form.username }}
+                        </div>
+                        <div class="input-box">
+                            {{ form.password.label }}
+                            {{ form.password }}
+                        </div>
+                        {{ form.usertype }}
+                        {{ form.submit }}
+                    </form>
+                    <a href="{{ url_for('signup') }}">Do not have an account? SignUp</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
