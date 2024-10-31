@@ -9,6 +9,7 @@
 
 body {
     padding-top: 70px;  /* To avoid navbar overlap */
+    padding-bottom: 60px; /* To avoid footer overlap */
 }
 
 .footer {

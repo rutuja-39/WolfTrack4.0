@@ -106,14 +106,15 @@ def login():
         user_role = request.form['user_role']
 
         user = get_user_by_username_role(username, user_role, database)
+        print(user)
         if user and bcrypt.check_password_hash(user[3], password):
             # User authenticated successfully
             login_user(app,user)
 
             if user_role == 'admin':
-                return redirect(url_for('admin', data=username))  # Replace with actual route name
+                return redirect(url_for('admin', data=user))  # Replace with actual route name
             elif user_role == 'student':
-                return redirect(url_for('student', data=username))  # Replace with actual route name
+                return redirect(url_for('student', data=user))  # Replace with actual route name
         else:
             flash('Invalid username, password, or role. Please try again.', 'danger')
             return redirect(url_for('login'))
