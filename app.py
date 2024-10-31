@@ -59,16 +59,6 @@ create_tables(database)
 #     password = db.Column(db.String(80), nullable=False)
 #     usertype = db.Column(db.String(20), nullable=False)
 
-class RegisterForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-    name = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Name"})
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-    usertype = SelectField(render_kw={"placeholder": "Usertype"}, choices=[('admin', 'Admin'), ('student', 'Student')])
-    submit = SubmitField('Register')
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -133,18 +123,27 @@ def login():
 
 @app.route('/signup',methods=['GET', 'POST'])
 def signup():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        user = find_user(str(form.username.data),database)
+    if request.method == 'POST':
+        name = request.form['name']
+        username = request.form['username']
+        password = request.form['password']
+        user_role = request.form['user_role']
+
+        user = find_user(username,database)
         if user:
             flash('Username already exists. Please choose a different username.', 'danger')
-            return render_template('signup.html',form = RegisterForm())
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_client = [form.name.data,form.username.data, hashed_password, form.usertype.data]
-        add_client(new_client,database)
-        return redirect(url_for('login'))
+            return render_template('signup.html')
+        hashed_password = bcrypt.generate_password_hash(password)
+        new_client = [name, username, hashed_password, user_role]
+        try:
+            add_client(new_client, database)
+            flash('Account created successfully! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash(f'Something went wrong. Try again. Error: {str(e)}', 'danger')
+            return render_template('signup.html')
 
-    return render_template('signup.html',form = RegisterForm())
+    return render_template('signup.html')
 
 @app.route('/admin',methods=['GET', 'POST'])
 def admin():
