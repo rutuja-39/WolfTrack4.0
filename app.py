@@ -68,7 +68,7 @@ def require_login():
     # Define routes that do not require login
     open_routes = ['/login', '/signup', '/static']
     # Bypass static files to prevent them from being blocked
-    if request.path.startswith('/static/'):
+    if request.path.startswith('/static/') or request.path=="/":
         return  # Allow static files
     # Get the current path
     path = request.path
@@ -81,8 +81,8 @@ def require_login():
         print(f"Path '{path}' is open, no login required.")
         return  # Allow open routes
 
-    # Redirect to login page if 'user_id' is not in the session
-    if 'user_id' not in session:
+    # Redirect to login page if 'user_name' is not in the session
+    if 'user_name' not in session or session.get('user_name') is None:
         print(f"User not logged in, redirecting to login.")
         flash('You need to be logged in to access this page.', 'danger')
         return redirect(url_for('login'))
@@ -96,7 +96,7 @@ def logout():
     session['type'] = ''
     session['user_id'] = None
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('/'))
 
 
 @app.route('/login',methods=['GET', 'POST'])
