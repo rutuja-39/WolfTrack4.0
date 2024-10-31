@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Skills Extractor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: rgb(240, 58, 58);
+            color: #ff0000; /* Red text */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 2px solid #ff0000; /* Red border */
+            border-radius: 10px;
+            background-color: #fff; /* White background */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+        }
+
+        h1 {
+            color: #ff0000; /* Red text */
+        }
+
+        .form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff0000; /* Red text */
+        }
+
+        #job_profile {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        .submit-btn {
+            background-color: #ff0000; /* Red background */
+            color: #fff; /* White text */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .skills-section {
+            margin-top: 20px;
+        }
+
+        #extracted_skills {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Job Skills Extractor</h1>
+        <form method="POST" class="form">
+            <label for="job_profile">Enter Job Profile Description:</label>
+            <textarea id="job_profile" name="job_profile" rows="6" class="text-area" placeholder="Describe the job profile...">{{ job_profile }}</textarea>
+            <br>
+            <input type="submit" value="Extract Skills" class="submit-btn">
+        </form>
+        
+        {% if skills_text %}
+            <div class="skills-section">
+                <label for="extracted_skills">Extracted Skills:</label>
+                <textarea id="extracted_skills" rows="4" class="text-area" readonly>{{ skills_text }}</textarea>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

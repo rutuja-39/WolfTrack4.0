@@ -10,6 +10,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '''
 import sqlite3
+import os
+
 
 def create_tables(db):
     conn = sqlite3.connect(db)
@@ -33,6 +35,16 @@ def create_tables(db):
         status TEXT
     )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS resumes (
+            id	INTEGER NOT NULL,
+            username	TEXT NOT NULL,
+            fileName	TEXT NOT NULL,
+            PRIMARY KEY(id AUTOINCREMENT),
+            UNIQUE(username, fileName),
+            FOREIGN KEY(username) REFERENCES client(username)
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -46,6 +58,16 @@ def add_client(value_set,db):
                        value_set)
     conn.commit()
     conn.close()
+
+def get_user_by_username_role(username, usertype, db):
+    conn = sqlite3.connect(db)
+    print('Data==>', username, usertype)
+    cursor = conn.cursor()
+    # Querying the 'client' table
+    cursor.execute("SELECT * FROM client WHERE username = ? AND usertype=?", (username,usertype))
+    rows = cursor.fetchone()
+    conn.close()
+    return rows
 
 
 def find_user(data,db):
@@ -69,34 +91,33 @@ def add_job(data,db):
     conn.commit()
     conn.close()
 
-def get_job_applications(db):
+def get_job_applications(user_name, db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM jobs")
+    cursor.execute("SELECT * FROM jobs WHERE user_name=?",(user_name,))
     rows = cursor.fetchall()  # Use fetchall() to get all rows
     conn.close()
-    print('rows ->>>', rows)
     return rows
 
 
-def update_job_application_by_id(company, location, jobposition, salary, status,db):
+def update_job_application_by_id(job_id, company, location, jobposition, salary, status,db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
     # Update the 'jobs' table based on jobid
-    cursor.execute("UPDATE jobs SET company_name=?, location=?, job_position=?, salary=?, status=? WHERE company_name=?",
-                   (company, location, jobposition, salary, status, company))
+    cursor.execute("UPDATE jobs SET company_name=?, location=?, job_position=?, salary=?, status=? WHERE id=?",
+                   (company, location, jobposition, salary, status, job_id))
 
     conn.commit()
     conn.close()
 
 
-def delete_job_application_by_company(company_name,db):
+def delete_job_application_by_job_id(job_id,db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
     # Delete the job application from the 'jobs' table based on the company name
-    cursor.execute("DELETE FROM jobs WHERE company_name=?", (company_name,))
+    cursor.execute("DELETE FROM jobs WHERE id=?", (job_id,))
 
     conn.commit()
     conn.close()
@@ -109,6 +130,23 @@ def get_job_applications_by_status(db, status):
     conn.close()
     print('rows ->>>', rows)
     return rows
+
+def get_resumes_by_user_name(user_name, db):
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    print("Tables:", tables)
+    db_path = os.path.abspath(db)
+    print(f"Connecting to database: {db_path}")
+
+    cursor.execute("SELECT * FROM resumes WHERE username = ?", (user_name,))
+    rows = cursor.fetchall()  # Use fetchall() to get all rows
+    conn.close()
+    print('rows ->>>', rows)
+    return rows
+
 
 
 

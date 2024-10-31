@@ -14,6 +14,11 @@ body {
   background-color: #e92626;
   padding: 30px;
 }
+.alert-custom-red {
+  color: red;
+  font-weight: bold;
+}
+
 .container{
   position: relative;
   max-width: 850px;

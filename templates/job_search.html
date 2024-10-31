@@ -1,86 +1,206 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout/init.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Job Search</title>
+{% block title %}Job Search{% endblock %}
 
-    <style>
-        body {
-            background-color: red;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+{% block content %}
+<div class="container mt-5">
+    <!-- Top Div: Search Filters -->
+    <div class="card p-4 mb-4 shadow">
+        <h2 class="mb-4">Search Jobs</h2>
+        <form action="/student/job_search/result" method="post" novalidate>
+            <div class="row mb-3">
+                <!-- Job Title Field -->
+                <div class="col-md-4">
+                    <label for="job_title" class="form-label">Job Title*</label>
+                    <input type="text" class="form-control" id="job_title" name="job_title" required placeholder="e.g. Software Engineer">
+                    <div class="invalid-feedback">Please provide a job title.</div>
+                </div>
+                <!-- Location Field -->
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" placeholder="e.g. New York">
+                </div>
+                <!-- Salary Fields -->
+                <div class="col-md-4">
+                    <label for="minSalary" class="form-label">Min. Salary</label>
+                    <input type="number" class="form-control" id="minSalary" name="minSalary" placeholder="e.g. 5000">
+                </div>
+                <div class="col-md-4">
+                    <label for="maxSalary" class="form-label">Max. Salary</label>
+                    <input type="number" class="form-control" id="maxSalary" name="maxSalary" placeholder="e.g. 10000">
+                </div>
+                <!-- Job Type Field -->
+                <div class="col-md-4">
+                    <label for="job_type" class="form-label">Job Type</label>
+                    <select class="form-select" id="job_type" name="job_type">
+                        <option value="">Select Job Type</option>
+                        <option value="full_time">Full-time</option>
+                        <option value="part_time">Part-time</option>
+                    </select>
+                </div>
+                <!-- Company Field -->
+                <div class="col-md-4">
+                    <label for="company" class="form-label">Company</label>
+                    <input type="text" class="form-control" id="company" name="company" placeholder="e.g. Apple">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search Jobs</button>
+        </form>
+    </div>
+
+    <!-- Bottom Div: Search Results -->
+    <div class="card p-4 shadow">
+        <h2 class="mb-4">Job Search Results</h2>
+        {% if jobs %}
+        <input class="form-control mb-3" id="searchInput" type="text" placeholder="Search for jobs...">
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Location</th>
+                    <th>Contract</th>
+                    <th>Description</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="jobTable">
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td>{{ job.company.display_name }}</td>
+                    <td>{{ job.location.display_name }}</td>
+                    <td>{{ job.contract_time }}, {{ job.contract_type }}</td>
+                    <td><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#jobModal{{ loop.index }}">Detail</button></td>
+                    <td><a href="{{ job.redirect_url }}" class="btn btn-info" target="_blank">Link</a></td>
+                </tr>
+                <!-- Bootstrap Modal -->
+                <div class="modal fade" id="jobModal{{ loop.index }}" tabindex="-1" aria-labelledby="jobModalLabel{{ loop.index }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="jobModalLabel{{ loop.index }}">Company: {{ job.company.display_name }}</h5>
+                                <h6 class="modal-title">Category: {{ job.category.label }}</h6>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Position: {{ job.title }}</h6>
+                                <h6>Location: {{ job.location.display_name }}</h6>
+                                {% if job.contract_time %} <h6>Contract Time: {{ job.contract_time }}</h6> {% endif %}
+                                {% if job.contract_type %} <h6>Contract Type: {{ job.contract_type }}</h6> {% endif %}
+                                {% if job.salary_min %} <h6>Min. Salary: {{ job.salary_min }}</h6> {% endif %}
+                                {% if job.salary_max %} <h6>Max. Salary: {{ job.salary_max }}</h6> {% endif %}
+                                <hr>
+                                <legend>Description:</legend>
+                                <p>{{ job.description }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="{{ job.redirect_url }}" class="btn btn-primary" target="_blank">Apply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Pagination Controls -->
+        <nav aria-label="Job table pagination">
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- Pagination items will be dynamically added here -->
+            </ul>
+        </nav>
+        {% else %}
+        <p class="text-muted">No jobs found. Please try a different search.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rowsPerPage = 5; // Number of rows to display per page
+    let rows = document.querySelectorAll('#jobTable tr');
+    let pagination = document.getElementById('pagination');
+    let currentPage = 1;
+
+    function displayTableRows() {
+        let visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        visibleRows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end) ? '' : 'none';
+        });
+    }
+
+    function updatePagination() {
+        let visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        let totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+        pagination.innerHTML = '';
+
+        // Display pages only if there are more than one
+        if (totalPages <= 1) {
+            return;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
+        // Previous button
+        if (currentPage > 1) {
+            let prevLi = document.createElement('li');
+            prevLi.className = 'page-item';
+            prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous">&laquo;</a>`;
+            prevLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage--;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(prevLi);
         }
 
-        form {
-            background-color: white;
-            color: red;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            let li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage = i;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(li);
         }
 
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: red;
-            font-weight: bold;
+        // Next button
+        if (currentPage < totalPages) {
+            let nextLi = document.createElement('li');
+            nextLi.className = 'page-item';
+            nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next">&raquo;</a>`;
+            nextLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage++;
+                displayTableRows();
+                updatePagination();
+            });
+            pagination.appendChild(nextLi);
         }
+    }
 
-        input {
-            padding: 10px;
-            width: calc(100% - 20px);
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            border: 1px solid red;
-            border-radius: 5px;
-            transition: border-color 0.3s ease;
-            color: red;
-        }
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
 
-        input[type="text"]:focus {
-            border-color: #ff9999;
-        }
+        rows.forEach(row => {
+            let rowText = row.innerText || row.textContent;
+            row.style.display = rowText.toUpperCase().includes(filter) ? '' : 'none';
+        });
 
-        input[type="submit"] {
-            background-color: red;
-            color: white;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
+        currentPage = 1; // Reset to first page
+        displayTableRows();
+        updatePagination();
+    });
 
-        input[type="submit"]:hover {
-            background-color: #ff9999;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Job Search</h1>
-    <form action="/student/job_search/result" method="post">
-        <label for="job_role">Enter Job Role:</label><br>
-        <input type="text" id="job_role" name="job_role" required><br>
-        <input type="submit" value="Search">
-    </form>
-</body>
-
-</html>
+    displayTableRows();
+    updatePagination();
+});
+</script>
+{% endblock %}

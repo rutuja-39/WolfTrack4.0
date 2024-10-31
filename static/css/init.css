@@ -1,0 +1,38 @@
+.navbar-custom {
+    background-color: rgb(139, 29, 29) !important;
+}
+
+.footer-custom {
+    background-color: rgb(139, 29, 29);
+    color: white;
+}
+
+body {
+    padding-top: 70px;  /* To avoid navbar overlap */
+    padding-bottom: 60px; /* To avoid footer overlap */
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+.btn-primary {
+    background-color: #ff4500; /* Customize the button color */
+}
+.modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.modal-footer {
+    border-top: none;
+}
