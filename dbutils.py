@@ -47,6 +47,16 @@ def add_client(value_set,db):
     conn.commit()
     conn.close()
 
+def get_user_by_username_role(username, usertype, db):
+    conn = sqlite3.connect(db)
+    print('Data==>', username, usertype)
+    cursor = conn.cursor()
+    # Querying the 'client' table
+    cursor.execute("SELECT * FROM client WHERE username = ? AND usertype=?", (username,usertype))
+    rows = cursor.fetchone()
+    conn.close()
+    return rows
+
 
 def find_user(data,db):
     conn = sqlite3.connect(db)
@@ -69,34 +79,33 @@ def add_job(data,db):
     conn.commit()
     conn.close()
 
-def get_job_applications(db):
+def get_job_applications(user_name, db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM jobs")
+    cursor.execute("SELECT * FROM jobs WHERE user_name=?",(user_name,))
     rows = cursor.fetchall()  # Use fetchall() to get all rows
     conn.close()
-    print('rows ->>>', rows)
     return rows
 
 
-def update_job_application_by_id(company, location, jobposition, salary, status,db):
+def update_job_application_by_id(job_id, company, location, jobposition, salary, status,db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
     # Update the 'jobs' table based on jobid
-    cursor.execute("UPDATE jobs SET company_name=?, location=?, job_position=?, salary=?, status=? WHERE company_name=?",
-                   (company, location, jobposition, salary, status, company))
+    cursor.execute("UPDATE jobs SET company_name=?, location=?, job_position=?, salary=?, status=? WHERE id=?",
+                   (company, location, jobposition, salary, status, job_id))
 
     conn.commit()
     conn.close()
 
 
-def delete_job_application_by_company(company_name,db):
+def delete_job_application_by_job_id(job_id,db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
     # Delete the job application from the 'jobs' table based on the company name
-    cursor.execute("DELETE FROM jobs WHERE company_name=?", (company_name,))
+    cursor.execute("DELETE FROM jobs WHERE id=?", (job_id,))
 
     conn.commit()
     conn.close()

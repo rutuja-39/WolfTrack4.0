@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WolfTrack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <input type="checkbox" id="flip">
+        <div class="cover">
+            <div class="front">
+                <img src="{{ url_for('static', filename='images/frontImg.jpg') }}" alt="">
+                <div class="text">
+                    <span class="text-1">
+                        <h2>WolfTrack</h2><br>
+                    </span>
+                    <span class="text-2">Don't stop until you're proud!</span>
+                </div>
+            </div>
+            <div class="back">
+                <img class="backImg" src="{{ url_for('static', filename='images/backImg.jpg') }}" alt="">
+                <div class="text">
+                    <span class="text-1">Complete miles of journey <br> with one click</span>
+                    <span class="text-2">Let's get started</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="forms">
+            <div class="form-content">
+                <div class="signup-form">
+                    <div class="title">Signup</div>
+                    <!-- Flash messages area -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mt-3" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="" id="signup-form">
+                        {{ form.hidden_tag() }}
+                        <div class="input-box">
+                            {{ form.name.label }}
+                            {{ form.name }}
+                        </div>
+                        <span class="error-message" id="nameMessage"></span>
+                        <div class="input-box">
+                            {{ form.username.label }}
+                            {{ form.username }}
+                        </div>
+                        <span class="error-message" id="usernameMessage"></span>
+                        <div class="input-box">
+                            {{ form.password.label }}
+                            {{ form.password }}
+                        </div>
+                        <span class="error-message" id="passwordMessage"></span>
+
+                        <div class="input-box">
+                            {{ form.usertype.label }}
+                            {{ form.usertype }}
+                        </div>
+                        {{ form.submit }}
+                    </form>
+                    <a href="{{ url_for('login') }}">Already have an account? Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real-time validation for the 'Name' field
+        document.getElementById("name").addEventListener("input", function () {
+            const name = document.getElementById("name").value;
+            const nameMessage = document.getElementById("nameMessage");
+
+            if (name.trim() === "") {
+                nameMessage.textContent = "Name cannot be empty.";
+                nameMessage.style.color = "red";
+            } else {
+                nameMessage.textContent = "";
+            }
+        });
+
+        // Real-time validation for the 'Username' field
+        document.getElementById("username").addEventListener("input", function () {
+            const username = document.getElementById("username").value;
+            const usernameMessage = document.getElementById("usernameMessage");
+
+            if (username.length < 4) {
+                usernameMessage.textContent = "Username must be at least 4 characters long.";
+                usernameMessage.style.color = "red";
+            } else if (username.length > 20) {
+                usernameMessage.textContent = "Username cannot exceed 20 characters.";
+                usernameMessage.style.color = "red";
+            } else {
+                usernameMessage.textContent = "";
+            }
+        });
+
+        // Real-time validation for the 'Password' field
+        document.getElementById("password").addEventListener("input", function () {
+            const password = document.getElementById("password").value;
+            const passwordMessage = document.getElementById("passwordMessage");
+
+            if (password.length < 8) {
+                passwordMessage.textContent = "Password must be at least 8 characters long.";
+                passwordMessage.style.color = "red";
+            } else if (password.length > 20) {
+                passwordMessage.textContent = "Password cannot exceed 20 characters.";
+                passwordMessage.style.color = "red";
+            } else {
+                passwordMessage.textContent = "";
+            }
+        });
+
+        // Submit button validation (checking all fields)
+        document.getElementById("signup-form").addEventListener("submit", function (event) {
+            const name = document.getElementById("name").value;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            let valid = true;
+
+            if (name.trim() === "") {
+                valid = false;
+                document.getElementById("nameMessage").textContent = "Name cannot be empty.";
+            }
+
+            if (username.length < 4 || username.length > 20) {
+                valid = false;
+                document.getElementById("usernameMessage").textContent = "Username must be between 4 and 20 characters.";
+            }
+
+            if (password.length < 8 || password.length > 20) {
+                valid = false;
+                document.getElementById("passwordMessage").textContent = "Password must be between 8 and 20 characters.";
+            }
+
+            if (!valid) {
+                event.preventDefault();  // Prevent form submission if validation fails
+            }
+        });
+    </script>
+</body>
+
+</html>
